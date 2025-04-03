@@ -8,7 +8,9 @@ from app.scrape_stores.single_page_structure.latitude64_scrape import get_all_pa
 
 
 def run_all_scrapers():
+    print("starting get_data_diskiundiskicesis")
     get_data_diskiundiskicesis() 
+    print("starting get_data_discking")
     get_data_discking() 
     get_data_discsport() 
     get_data_par3() 

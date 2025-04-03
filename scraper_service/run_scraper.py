@@ -1,5 +1,4 @@
-# scraper_service/run_scraper.py
-
+print("Starting scraper service...")
 import sys
 import os
 
@@ -7,8 +6,12 @@ import os
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, project_root)
 
-# Now import your module
-from app.scrape_stores.perform_data_update import run_all_scrapers
+try:
+    print("Trying to import run_all_scrapers...")
+    from app.scrape_stores.perform_data_update import run_all_scrapers
+    print("Import successful.")
 
-# Run the scrapers
-run_all_scrapers()
+    print("About to run all scrapers...")
+    run_all_scrapers()
+except Exception as e:
+    print("An error occurred:", e)
