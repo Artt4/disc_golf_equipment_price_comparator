@@ -145,6 +145,9 @@ def get_data_latitude64(all_urls):
 
     connection.close()
 
+def run_latitude64_scraper():
+    urls = get_all_pages_latitude64()
+    get_data_latitude64(urls)
+
 if __name__ == "__main__":
-    urls = get_all_pages_latitude64()  # Fetch URLs first
-    get_data_latitude64(urls)  # Pass to scraper
+    run_latitude64_scraper()
