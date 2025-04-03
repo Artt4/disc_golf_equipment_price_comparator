@@ -26,16 +26,15 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy app files from the parent directory to the container's /app directory
-COPY run_scraper.py /app/run_scraper.py
-COPY ../app ./app
-COPY ../.env .env
+COPY /scraper_service/run_scraper.py /app/run_scraper.py
+COPY app ./app
+COPY .env .env
 
 # Install Python dependencies including Playwright
 RUN pip install --no-cache-dir -r app/requirements.txt
 
-# Install Playwright browsers
-RUN pip install playwright && \
-    python -m playwright install --with-deps
+# Install Playwright (but NOT the browsers yet)
+RUN pip install playwright
 
-# Run scraper when the container starts
-CMD ["python", "run_scraper.py"]
+# At container runtime: install browsers, then run scraper
+CMD ["sh", "-c", "python -m playwright install --with-deps && python run_scraper.py"]
