@@ -2,8 +2,7 @@ print("Starting scraper service...")
 import sys
 import os
 
-# Add the project root to Python's path
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+project_root = os.path.abspath(os.path.dirname(__file__))  # Use `/app` instead of `/app/..`
 sys.path.insert(0, project_root)
 
 try:

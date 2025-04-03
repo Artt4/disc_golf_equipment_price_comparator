@@ -125,4 +125,4 @@ def get_data_discsport():
         connection.close()
 
 if __name__ == "__main__":
-    get_data_discsport
+    get_data_discsport()

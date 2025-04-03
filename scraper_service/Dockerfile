@@ -15,7 +15,9 @@ RUN apt-get update && apt-get install -y \
 # Copy project files
 COPY scraper_service/run_scraper.py /app/run_scraper.py
 COPY app /app/app
+ENV APP_ENV=local
 COPY .env /app/.env
+
 
 # Install Python dependencies (including Playwright)
 RUN pip install --no-cache-dir -r app/requirements.txt && \
