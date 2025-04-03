@@ -6,7 +6,7 @@ from app.handle_db_connections import create_conn, execute_insert, execute_selec
 
 app = Flask(__name__)
 
-app.secret_key = 'random_secret_key'
+app.secret_key = get_secret("SECRET_KEY")  # ✅ Store in Secret Manager/.env
 app.config['GOOGLE_ID'] = get_secret("google_id")
 app.config['GOOGLE_SECRET'] = get_secret("google_secret")
 
