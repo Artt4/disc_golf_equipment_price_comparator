@@ -1,7 +1,7 @@
 import pymysql
 import decimal
 
-from handle_credentials import get_secret
+from app.handle_credentials import get_secret
 
 def create_conn():
 

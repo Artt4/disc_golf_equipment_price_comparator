@@ -72,6 +72,14 @@ def get_data_diskiundiskicesis():
                     if ',' in flight_ratings.get('Fade'):
                         flight_ratings['Fade'] = flight_ratings.get('Fade').replace(',', '.')
 
+                    for key in ['Speed', 'Glide', 'Turn', 'Fade']:
+                        value = flight_ratings.get(key)
+                        try:
+                            flight_ratings[key] = float(value.strip()) if value else None
+                        except Exception:
+                            print(f"Failed to convert '{value}' for {key}")
+                            flight_ratings[key] = None
+
             else:
                 flight_ratings['Speed'] = None
                 flight_ratings['Glide'] = None
@@ -93,6 +101,8 @@ def get_data_diskiundiskicesis():
                 'image_url': image_url,
                 'store': "diskiundiski.lv"
             }
+            print(f"Raw flight ratings for {title}: {product.find('product-card-title').get_text()}")
+            print(f"Processed flight ratings: {flight_ratings}")
 
             combined = f"{result.get('title')}_{result.get('store')}"
             combined = combined.lower().replace(' ', '')
@@ -151,4 +161,5 @@ def get_data_diskiundiskicesis():
             
             connection.close()
 
-get_data_diskiundiskicesis()
+if __name__ == "__main__":
+    get_data_diskiundiskicesis()

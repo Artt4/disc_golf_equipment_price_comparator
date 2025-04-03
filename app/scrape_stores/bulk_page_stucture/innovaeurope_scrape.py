@@ -123,3 +123,6 @@ def get_data_discsport():
     finally:
 
         connection.close()
+
+if __name__ == "__main__":
+    get_data_discsport

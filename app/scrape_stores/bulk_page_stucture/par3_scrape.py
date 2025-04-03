@@ -21,8 +21,9 @@ def get_data_par3():
         all_products = []
 
         print("getting par3 page")
-
         page_url = f"https://www.par3.lv/collections/disku-golfa-diski?page={url_placeholder}"
+
+
         
         response = requests.get(page_url)
 
@@ -102,6 +103,22 @@ def get_data_par3():
 
         url_placeholder = url_placeholder + 1
 
+        pagination_span = soup.find('span', class_='pagination__current')
+        if pagination_span:
+            try:
+                current, max_page = pagination_span.get_text(strip=True).split('/')
+                current_page = int(current.strip())
+                max_page = int(max_page.strip())
+                if url_placeholder > max_page:
+                    print(f"Reached end: page {url_placeholder} > {max_page}")
+                    break
+            except Exception as e:
+                print(f"⚠️ Could not parse pagination: {e}")
+                break
+        else:
+            print("⚠️ Pagination element not found, assuming last page")
+            break
+
         ############################################################################################
 
         connection = create_conn()
@@ -148,5 +165,6 @@ def get_data_par3():
         finally:
             
             connection.close()
-
-get_data_par3()
+            
+if __name__ == "__main__":
+    get_data_par3()

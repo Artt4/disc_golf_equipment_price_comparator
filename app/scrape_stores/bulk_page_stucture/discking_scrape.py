@@ -1,42 +1,53 @@
 import sys
 import os
 import hashlib
-
 from bs4 import BeautifulSoup
 from xml.etree import ElementTree as ET
-from requests_html import HTMLSession
 
-current_directory = os.path.dirname(os.path.realpath(__file__))
-app_directory = os.path.abspath(os.path.join(current_directory, '..', '..'))
-sys.path.append(app_directory)
+from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
 
-from handle_db_connections import create_conn
+
+def get_rendered_html(url):
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page()
+        try:
+            print(f"Visiting: {url}")
+            page.goto(url, timeout=10000)  # 10s timeout for navigation
+            page.wait_for_selector("article.productitem", timeout=5000)  # wait for content
+        except PlaywrightTimeout:
+            print(f"Timeout waiting for product cards on {url}")
+        except Exception as e:
+            print(f"Error navigating to {url}: {e}")
+        html = page.content()
+        browser.close()
+        return html
 
 def get_data_discking():
+    current_directory = os.path.dirname(os.path.realpath(__file__))
+    app_directory = os.path.abspath(os.path.join(current_directory, '..', '..'))
+    sys.path.append(app_directory)
+    
+    from handle_db_connections import create_conn
 
     url_placeholder = 1
 
     while True:
-
         all_products = []
-
         print("getting discking page")
 
         page_url = f"https://kiekkokingi.fi/collections/uudet-frisbeegolfkiekot?page={url_placeholder}&grid_list=grid-view"
 
-        session = HTMLSession()
-
-        response = session.get(page_url)
-
-        response.html.render(timeout=20, sleep=2)
-        
-        html_content = response.html.html
-
+        # Get rendered HTML using Selenium
+        html_content = get_rendered_html(page_url)
         soup = BeautifulSoup(html_content, 'html.parser')
 
         ############################################################################################
 
         products = soup.find_all('article', class_='productitem')
+        if not products:
+            print(f"No products found on page {url_placeholder}. Scraping finished.")
+            break
 
         if products == []:
             break
@@ -134,4 +145,5 @@ def get_data_discking():
 
             connection.close()
 
-get_data_discking()
+if __name__ == "__main__":
+    get_data_discking()
