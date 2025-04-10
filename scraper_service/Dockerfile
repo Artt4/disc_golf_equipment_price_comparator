@@ -43,8 +43,8 @@ RUN pip install --no-cache-dir playwright
 # Install just Chromium (you don’t need Firefox/WebKit)
 RUN python -m playwright install chromium
 
-ENV APP_ENV=prod
-ENV GOOGLE_CLOUD_PROJECT=chrome-inkwell-455616-p9
+#ENV APP_ENV=prod
+#ENV GOOGLE_CLOUD_PROJECT=chrome-inkwell-455616-p9
 #ENV GOOGLE_APPLICATION_CREDENTIALS=/app/sa-key.json
 
 CMD ["python", "run_scraper.py"]
