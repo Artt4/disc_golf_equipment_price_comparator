@@ -33,7 +33,7 @@ COPY scrape_stores ./scrape_stores
 COPY handle_credentials.py .
 COPY handle_db_connections.py .
 COPY requirements.txt .
-#COPY sa-key.json /app/sa-key.json
+#COPY sa-key.json .
 
 
 # Install Python dependencies
@@ -45,6 +45,6 @@ RUN python -m playwright install chromium
 
 ENV APP_ENV=prod
 ENV GOOGLE_CLOUD_PROJECT=chrome-inkwell-455616-p9
-ENV GOOGLE_APPLICATION_CREDENTIALS=/app/sa-key.json
+#ENV GOOGLE_APPLICATION_CREDENTIALS=/app/sa-key.json
 
 CMD ["python", "run_scraper.py"]
