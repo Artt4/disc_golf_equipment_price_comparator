@@ -1,4 +1,4 @@
-print("Starting scraper service...")
+print("Now starting scraper service...")
 import sys
 import os
 
