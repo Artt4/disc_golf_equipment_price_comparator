@@ -21,12 +21,20 @@ RUN apt-get update && apt-get install -y \
     libgbm1 \
     fonts-liberation \
     xdg-utils \
+    libxkbcommon0 \
+    libpango-1.0-0 \
+    libcairo2 \
+    libcups2 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copy project files
+# Copy only necessary files
 COPY scraper_service/run_scraper.py .
-COPY app ./app
-COPY .env .
+COPY app/scrape_stores ./app/scrape_stores
+COPY app/handle_credentials.py ./app/
+COPY app/handle_db_connections.py ./app/
+COPY app/requirements.txt ./app/
+COPY sa-key.json /app/sa-key.json
+
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r app/requirements.txt
@@ -35,6 +43,8 @@ RUN pip install --no-cache-dir playwright
 # Install just Chromium (you don’t need Firefox/WebKit)
 RUN python -m playwright install chromium
 
-ENV APP_ENV=local
+ENV APP_ENV=prod
+ENV GOOGLE_CLOUD_PROJECT=chrome-inkwell-455616-p9
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/sa-key.json
 
 CMD ["python", "run_scraper.py"]

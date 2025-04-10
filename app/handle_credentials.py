@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from google.cloud import secretmanager
+from google.api_core.exceptions import  PermissionDenied
 
 def get_secret(secret_name):
     app_env = os.getenv('APP_ENV', 'local').lower()
