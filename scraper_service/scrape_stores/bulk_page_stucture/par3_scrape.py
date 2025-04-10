@@ -113,10 +113,10 @@ def get_data_par3():
                     print(f"Reached end: page {url_placeholder} > {max_page}")
                     break
             except Exception as e:
-                print(f"⚠️ Could not parse pagination: {e}")
+                print(f"Could not parse pagination: {e}")
                 break
         else:
-            print("⚠️ Pagination element not found, assuming last page")
+            print("Pagination element not found, assuming last page")
             break
 
         ############################################################################################

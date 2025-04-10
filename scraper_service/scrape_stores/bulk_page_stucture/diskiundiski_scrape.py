@@ -101,8 +101,6 @@ def get_data_diskiundiskicesis():
                 'image_url': image_url,
                 'store': "diskiundiski.lv"
             }
-            print(f"Raw flight ratings for {title}: {product.find('product-card-title').get_text()}")
-            print(f"Processed flight ratings: {flight_ratings}")
 
             combined = f"{result.get('title')}_{result.get('store')}"
             combined = combined.lower().replace(' ', '')

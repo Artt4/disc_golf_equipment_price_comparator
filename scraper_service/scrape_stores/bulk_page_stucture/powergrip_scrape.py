@@ -107,10 +107,8 @@ def get_data_powergrip_from_bulk():
                 except Exception as e:
                     print(f"Error parsing product card: {e}")
 
-            print(f"Saved {len(new_products)} new products to DB.")
 
             try:
-                print("Clicking 'Näytä lisää tuotteita'...")
                 page.wait_for_selector(".ais-infinite-hits--showmoreButton", state="visible")
                 page.dispatch_event(".ais-infinite-hits--showmoreButton", "click")
                 page.wait_for_selector(
