@@ -28,7 +28,7 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy only necessary files
-COPY scraper_service/run_scraper.py .
+COPY run_scraper.py .
 COPY app/scrape_stores ./app/scrape_stores
 COPY app/handle_credentials.py ./app/
 COPY app/handle_db_connections.py ./app/
@@ -43,8 +43,5 @@ RUN pip install --no-cache-dir playwright
 # Install just Chromium (you don’t need Firefox/WebKit)
 RUN python -m playwright install chromium
 
-ENV APP_ENV=prod
-ENV GOOGLE_CLOUD_PROJECT=chrome-inkwell-455616-p9
-ENV GOOGLE_APPLICATION_CREDENTIALS=/app/sa-key.json
 
 CMD ["python", "run_scraper.py"]
