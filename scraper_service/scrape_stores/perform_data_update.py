@@ -9,10 +9,10 @@ from scrape_stores.bulk_page_stucture.powergrip_scrape import get_data_powergrip
 def run_all_scrapers():
     print("starting get_data_diskiundiskicesis")
     get_data_diskiundiskicesis() 
-    get_data_discking() 
-    get_data_discsport() 
-    get_data_par3() 
-    get_data_powergrip_from_bulk() 
+    #get_data_discking() 
+    #get_data_discsport() 
+    #get_data_par3() 
+    #get_data_powergrip_from_bulk() 
     #run_latitude64_scraper()
 
 
