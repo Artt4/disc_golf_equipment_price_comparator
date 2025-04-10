@@ -33,7 +33,7 @@ COPY scrape_stores ./scrape_stores
 COPY handle_credentials.py .
 COPY handle_db_connections.py .
 COPY requirements.txt .
-COPY sa-key.json /app/sa-key.json
+#COPY sa-key.json /app/sa-key.json
 
 
 # Install Python dependencies
