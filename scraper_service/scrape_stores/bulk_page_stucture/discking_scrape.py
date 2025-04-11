@@ -10,11 +10,12 @@ from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeo
 def get_rendered_html(url):
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
+        page = browser.new_page(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
         try:
             print(f"Visiting: {url}")
-            page.goto(url, timeout=10000)  # 10s timeout for navigation
-            page.wait_for_selector("article.productitem", timeout=5000)  # wait for content
+            page.goto(url, timeout=30000)  # 10s timeout for navigation
+            page.wait_for_load_state("networkidle", timeout=15000)  # Wait for all requests
+            page.wait_for_selector("article.productitem", timeout=15000)  # wait for content
         except PlaywrightTimeout:
             print(f"Timeout waiting for product cards on {url}")
         except Exception as e:
