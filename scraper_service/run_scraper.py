@@ -8,7 +8,7 @@ sys.path.insert(0, project_root)
 
 try:
     print("Trying to import run_all_scrapers...")
-    from app.scrape_stores.perform_data_update import run_all_scrapers
+    from scrape_stores.perform_data_update import run_all_scrapers
     print("Import successful.")
 
     print("About to run all scrapers...")
