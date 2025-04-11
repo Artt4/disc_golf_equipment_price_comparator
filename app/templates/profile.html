@@ -68,6 +68,27 @@
                     <button class="custombutton wishlist-button">Remove from Wishlist</button>
                 </div>
             {% endfor %}
+            <!-- Recommendation Section -->
+            {% if recommendation.unique_id %}
+                <h2 style="text-align: center; margin-top: 20px;">Recommended for You</h2>
+                <div class="card">
+                    <a href="{{ recommendation.link_to_disc }}" class="card-link">
+                        <img src="{{ recommendation.image_url }}" alt="{{ recommendation.title }}" onerror="this.src='/static/placeholder.svg';">
+                        <h2>{{ recommendation.title }}</h2>
+                        <h3>Price: {{ recommendation.price }}{{ recommendation.currency }}</h3>
+                        {% if recommendation.speed is not none or recommendation.glide is not none or recommendation.turn is not none or recommendation.fade is not none %}
+                        <div class="flight-ratings">
+                            <strong>Flight Ratings:</strong><br>
+                            Speed: <span class="speed">{{ recommendation.speed if recommendation.speed is not none else 'N/A' }}</span>, 
+                            Glide: <span class="glide">{{ recommendation.glide if recommendation.glide is not none else 'N/A' }}</span>, 
+                            Turn: <span class="turn">{{ recommendation.turn if recommendation.turn is not none else 'N/A' }}</span>, 
+                            Fade: <span class="fade">{{ recommendation.fade if recommendation.fade is not none else 'N/A' }}</span>
+                        </div>
+                        {% endif %}
+                        <p>Store: {{ recommendation.store }}</p>
+                    </a>
+                </div>
+            {% endif %}
         </div>
     </div>
 

@@ -128,13 +128,22 @@ def profile():
     me = json.loads(me.get("raw_data"))
     user = {'email': me.get("email"), 'picture': me.get("picture")}
 
+    # Get recommendation
+    recommender_url = "http://localhost:8080/recommend" if os.getenv("APP_ENV") == "local" else "https://recommender-534282508863.europe-north1.run.app/recommend"
+    try:
+        response = requests.get(f"{recommender_url}?user_id={session_id}", timeout=5)
+        recommendation = response.json()
+    except requests.RequestException:
+        recommendation = {"title": "Recommendation unavailable", "unique_id": None}
+
     return render_template(
         'profile.html', 
         products=paginated_products,
         page=page,
         total_pages=(len(products) + per_page - 1) // per_page,
         pages_to_display=range(page, min(page + 3, ((len(products) + per_page - 1) // per_page) + 1)),
-        user=user
+        user=user,
+        recommendation=recommendation  # Pass to template
     )
 
 @app.route('/add-to-wishlist', methods=['POST'])
@@ -156,25 +165,7 @@ def add_to_wishlist():
 
     return "Product added to wishlist!"
 
-@app.route('/remove-from-wishlist', methods=['POST'])
-def remove_from_wishlist():
-    product_data = request.get_json()
-    session_id = session.get('id')
 
-    sql_query = "SELECT product_history FROM users WHERE id = %s"
-    connection = create_conn()
-    user_json = execute_select(connection, sql_query, (session_id,))
-    product_history = json.loads(user_json[0].get("product_history"))
-    
-    unique_id_to_remove = product_data.get("unique_id")
-    if unique_id_to_remove in product_history["product_history"]:
-        product_history["product_history"].remove(unique_id_to_remove)
-
-    query = "UPDATE users SET product_history = %s WHERE id = %s"
-    connection = create_conn()
-    execute_insert(connection, query, [(json.dumps(product_history), session_id)])
-
-    return redirect(url_for('profile'))
 
 @app.route("/recommendation")
 def recommendation():
@@ -182,7 +173,7 @@ def recommendation():
         return redirect(url_for("login"))
     user_id = session["id"]
     import requests
-    recommender_url = "https://recommender-534282508863.europe-north1.run.app/recommend"  # Replace with your URL
+    recommender_url = "https://recommender-534282508863.europe-north1.run.app/recommend"
     try:
         response = requests.get(f"{recommender_url}?user_id={user_id}", timeout=5)
         recommendation = response.json()
