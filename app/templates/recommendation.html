@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head><title>Recommendation</title></head>
+<body>
+  <h1>Recommended Disc</h1>
+  {% if recommendation.unique_id %}
+    <p>{{ recommendation.title }} ({{ recommendation.price }} {{ recommendation.currency }}) from {{ recommendation.store }}</p>
+    <img src="{{ recommendation.image_url }}" alt="{{ recommendation.title }}" style="max-width: 300px;">
+    <p><a href="{{ recommendation.link_to_disc }}">Buy Now</a></p>
+  {% else %}
+    <p>{{ recommendation.title }}</p>
+  {% endif %}
+  <a href="{{ url_for('product_grid') }}">Back to Products</a>
+</body>
+</html>

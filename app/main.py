@@ -176,6 +176,20 @@ def remove_from_wishlist():
 
     return redirect(url_for('profile'))
 
+@app.route("/recommendation")
+def recommendation():
+    if "id" not in session:
+        return redirect(url_for("login"))
+    user_id = session["id"]
+    import requests
+    recommender_url = "https://recommender-534282508863.europe-north1.run.app"  # Replace with your URL
+    try:
+        response = requests.get(f"{recommender_url}?user_id={user_id}", timeout=5)
+        recommendation = response.json()
+    except requests.RequestException:
+        recommendation = {"title": "Recommendation unavailable", "unique_id": None}
+    return render_template("recommendation.html", recommendation=recommendation)
+
 # Helper functions
 def process_product(product):
     if product.get('speed') is not None:

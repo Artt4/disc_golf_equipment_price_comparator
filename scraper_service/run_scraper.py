@@ -15,12 +15,3 @@ try:
     run_all_scrapers()
 except Exception as e:
     print("An error occurred:", e)
-
-#docker build -t run-scraper -f scraper_service/Dockerfile .
-#docker build --no-cache -t run-scraper -f scraper_service/Dockerfile .
-    
-#docker run --env-file .env run-scraper
-#docker run -it --env-file .env run-scraper bash
-
-#docker run -p 8080:8080 discgolf-app
-#docker build -t discgolf-app .
