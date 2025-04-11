@@ -1,4 +1,6 @@
 import json
+import os
+import requests
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 from flask_oauthlib.client import OAuth
 from app.handle_credentials import get_secret
