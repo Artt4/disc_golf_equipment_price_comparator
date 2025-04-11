@@ -182,7 +182,7 @@ def recommendation():
         return redirect(url_for("login"))
     user_id = session["id"]
     import requests
-    recommender_url = "https://recommender-534282508863.europe-north1.run.app"  # Replace with your URL
+    recommender_url = "https://recommender-534282508863.europe-north1.run.app/recommend"  # Replace with your URL
     try:
         response = requests.get(f"{recommender_url}?user_id={user_id}", timeout=5)
         recommendation = response.json()
