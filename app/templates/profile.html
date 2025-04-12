@@ -279,6 +279,16 @@
             }
 
             function addToWishlist(productData, card, button) {
+                // Check for duplicates in wishlist
+                const wishlistContainer = document.getElementById('wishlist-container');
+                const existingCard = wishlistContainer.querySelector(`[data-unique-id="${productData.unique_id}"]`);
+                if (existingCard) {
+                    showToast('Item already in wishlist');
+                    button.textContent = 'Add to Wishlist';
+                    button.disabled = false;
+                    return;
+                }
+                
                 button.disabled = true;
                 button.textContent = 'Adding...';
                 fetch('/add-to-wishlist', {
