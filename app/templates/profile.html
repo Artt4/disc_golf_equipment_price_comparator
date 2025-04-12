@@ -16,6 +16,26 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='profile/pagination_profile.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css_product_grid/sidebar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='profile/cards.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='profile/recommendation.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='profile/wishlist.css') }}">
+
+    <style>
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #333;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+        .toast.show {
+            opacity: 1;
+        }
+    </style>
 </head>
 
 <body>
@@ -26,7 +46,7 @@
     </div>
     <div id="infoBackdrop">
         <div class="popupContent">
-            <span id="popupClose">&times;</span>
+            <span id="popupClose">×</span>
             <h3>Information</h3>
             <p>This page is part of a project at LUT University, within the scope of the CT70A9700 Cloud Services and Infrastructure course.</p>
         </div>
@@ -44,10 +64,11 @@
         </div>
     </div>
 
+    <h2 class="wishlist-title">Wishlist</h2>
     <div class="main-container">
-        <div class="container" id="container1">
+        <div class="container" id="wishlist-container">
             {% for product in products %}
-                <div class="card">
+                <div class="card" data-unique-id="{{ product.unique_id }}">
                     <a href="{{ product.link_to_disc }}" class="card-link">
                         <img src="{{ product.image_url }}" alt="{{ product.title }}" onerror="this.src='/static/placeholder.svg';">
                         <h2>{{ product.title }}</h2>
@@ -65,32 +86,37 @@
 
                         <p>Store: {{ product.store }}</p>
                     </a>
-                    <button class="custombutton wishlist-button">Remove from Wishlist</button>
+                    <button class="custombutton wishlist-button" data-product='{{ product | tojson | safe }}'>Remove from Wishlist</button>
                 </div>
             {% endfor %}
-            <!-- Recommendation Section -->
-            {% if recommendation.unique_id %}
-                <h2 style="text-align: center; margin-top: 20px;">Recommended for You</h2>
-                <div class="card">
-                    <a href="{{ recommendation.link_to_disc }}" class="card-link">
-                        <img src="{{ recommendation.image_url }}" alt="{{ recommendation.title }}" onerror="this.src='/static/placeholder.svg';">
-                        <h2>{{ recommendation.title }}</h2>
-                        <h3>Price: {{ recommendation.price }}{{ recommendation.currency }}</h3>
-                        {% if recommendation.speed is not none or recommendation.glide is not none or recommendation.turn is not none or recommendation.fade is not none %}
-                        <div class="flight-ratings">
-                            <strong>Flight Ratings:</strong><br>
-                            Speed: <span class="speed">{{ recommendation.speed if recommendation.speed is not none else 'N/A' }}</span>, 
-                            Glide: <span class="glide">{{ recommendation.glide if recommendation.glide is not none else 'N/A' }}</span>, 
-                            Turn: <span class="turn">{{ recommendation.turn if recommendation.turn is not none else 'N/A' }}</span>, 
-                            Fade: <span class="fade">{{ recommendation.fade if recommendation.fade is not none else 'N/A' }}</span>
-                        </div>
-                        {% endif %}
-                        <p>Store: {{ recommendation.store }}</p>
-                    </a>
+        </div>
+    </div>
+
+    {% if recommendation.unique_id %}
+    <div class="recommendation-section">
+        <h2 class="recommendation-title">Recommended for You</h2>
+        <div class="card" data-unique-id="{{ recommendation.unique_id }}">
+            <a href="{{ recommendation.link_to_disc }}" class="card-link">
+                <img src="{{ recommendation.image_url }}" alt="{{ recommendation.title }}" onerror="this.src='/static/placeholder.svg';">
+                <h2>{{ recommendation.title }}</h2>
+                <h3>Price: {{ recommendation.price }}{{ recommendation.currency }}</h3>
+                {% if recommendation.speed is not none or recommendation.glide is not none or recommendation.turn is not none or recommendation.fade is not none %}
+                <div class="flight-ratings">
+                    <strong>Flight Ratings:</strong><br>
+                    Speed: <span class="speed">{{ recommendation.speed if recommendation.speed is not none else 'N/A' }}</span>, 
+                    Glide: <span class="glide">{{ recommendation.glide if recommendation.glide is not none else 'N/A' }}</span>, 
+                    Turn: <span class="turn">{{ recommendation.turn if recommendation.turn is not none else 'N/A' }}</span>, 
+                    Fade: <span class="fade">{{ recommendation.fade if recommendation.fade is not none else 'N/A' }}</span>
                 </div>
+                {% endif %}
+                <p>Store: {{ recommendation.store }}</p>
+            </a>
+            {% if 'google_token' in session %}
+                <button class="custombutton wishlist-button" data-product='{{ recommendation | tojson | safe }}'>Add to Wishlist</button>
             {% endif %}
         </div>
     </div>
+    {% endif %}
 
     <div class="pagination-wrapper">
         <div class="pagination-container" id="container2">
@@ -119,6 +145,8 @@
         </div>
     </div>
 
+    <div id="toast" class="toast"></div>
+
     <script>
         function centerContainer2() {
             requestAnimationFrame(() => {
@@ -132,64 +160,229 @@
                 }
             });
         }
-    
         window.addEventListener('load', centerContainer2);
         window.addEventListener('resize', centerContainer2);
-    </script>
 
-    <script>
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function createCard(product) {
+            return `
+                <div class="card" data-unique-id="${product.unique_id}">
+                    <a href="${product.link_to_disc}" class="card-link">
+                        <img src="${product.image_url}" alt="${product.title}" onerror="this.src='/static/placeholder.svg';">
+                        <h2>${product.title}</h2>
+                        <h3>Price: ${product.price}${product.currency}</h3>
+                        ${product.speed || product.glide || product.turn || product.fade ?
+                            `<div class="flight-ratings">
+                                <strong>Flight Ratings:</strong><br>
+                                Speed: <span class="speed">${product.speed ?? 'N/A'}</span>, 
+                                Glide: <span class="glide">${product.glide ?? 'N/A'}</span>, 
+                                Turn: <span class="turn">${product.turn ?? 'N/A'}</span>, 
+                                Fade: <span class="fade">${product.fade ?? 'N/A'}</span>
+                            </div>` : ''}
+                        <p>Store: ${product.store}</p>
+                    </a>
+                    <button class="custombutton wishlist-button" data-product='${JSON.stringify(product)}'>Remove from Wishlist</button>
+                </div>
+            `;
+        }
+
         document.addEventListener("DOMContentLoaded", function() {
             const products = {{ products | tojson | safe }};
-    
+            const recommendation = {{ recommendation | tojson | safe }};
+            const userId = {{ session.id | tojson | safe }};
+            const recommenderUrl = {{ "https://recommender-534282508863.europe-north1.run.app/recommend" | tojson | safe }};
+
             function formatNumber(number) {
                 if (number === null || number === undefined) {
-                    return "N/A"; 
+                    return "N/A";
                 }
                 return number % 1 === 0 ? number.toFixed(0) : number.toFixed(1);
             }
-    
+
             Array.from(document.querySelectorAll('.card')).forEach((card, index) => {
-                const product = products[index];
+                const isRecommendation = index >= products.length;
+                const product = isRecommendation ? recommendation : products[index];
                 if (product) {
                     const speedElem = card.querySelector('.speed');
                     const glideElem = card.querySelector('.glide');
                     const turnElem = card.querySelector('.turn');
                     const fadeElem = card.querySelector('.fade');
-    
+
                     if (speedElem) speedElem.textContent = formatNumber(product.speed);
                     if (glideElem) glideElem.textContent = formatNumber(product.glide);
                     if (turnElem) turnElem.textContent = formatNumber(product.turn);
                     if (fadeElem) fadeElem.textContent = formatNumber(product.fade);
-    
+
                     const wishlistButton = card.querySelector('.wishlist-button');
                     if (wishlistButton) {
                         wishlistButton.addEventListener('click', function() {
-                            removeFromWishlist(product, card, wishlistButton);
+                            const productData = JSON.parse(wishlistButton.getAttribute('data-product'));
+                            if (isRecommendation) {
+                                addToWishlist(productData, card, wishlistButton);
+                            } else {
+                                removeFromWishlist(productData, card, wishlistButton);
+                            }
                         });
                     }
                 }
             });
-    
+
             function removeFromWishlist(productData, card, button) {
+                button.disabled = true;
+                button.textContent = 'Removing...';
                 fetch('/remove-from-wishlist', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(productData)
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    console.log('Response JSON:', data);
                     if (data.success) {
-                        console.log('Product removed from wishlist successfully!');
+                        card.style.transition = 'opacity 0.3s ease';
+                        card.style.opacity = '0';
+                        setTimeout(() => {
+                            card.remove();
+                            if (!document.querySelectorAll('#wishlist-container .card').length) {
+                                const paginationWrapper = document.querySelector('.pagination-wrapper');
+                                if (paginationWrapper) {
+                                    paginationWrapper.style.display = 'none';
+                                }
+                            }
+                            showToast('Removed from wishlist');
+                            fetchNewRecommendation();
+                        }, 300);
                     } else {
-                        console.log('Failed to remove product from wishlist.');
+                        showToast('Failed to remove item: ' + data.message);
+                        button.textContent = 'Remove from Wishlist';
+                        button.disabled = false;
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
+                    console.error('Remove Error:', error);
+                    showToast('Error removing item: ' + error.message);
+                    button.textContent = 'Remove from Wishlist';
+                    button.disabled = false;
                 });
+            }
+
+            function addToWishlist(productData, card, button) {
+                button.disabled = true;
+                button.textContent = 'Adding...';
+                fetch('/add-to-wishlist', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(productData)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        button.textContent = 'Added';
+                        button.classList.add('added');
+                        const wishlistContainer = document.getElementById('wishlist-container');
+                        wishlistContainer.insertAdjacentHTML('afterbegin', createCard(productData));
+                        const newCard = wishlistContainer.querySelector(`[data-unique-id="${data.unique_id}"]`);
+                        const newButton = newCard.querySelector('.wishlist-button');
+                        newButton.addEventListener('click', () => removeFromWishlist(productData, newCard, newButton));
+                        showToast('Added to wishlist');
+                        card.style.transition = 'opacity 0.3s ease';
+                        card.style.opacity = '0';
+                        setTimeout(() => {
+                            const recommendationSection = document.querySelector('.recommendation-section');
+                            if (recommendationSection) {
+                                recommendationSection.remove();
+                            }
+                            fetchNewRecommendation();
+                        }, 300);
+                    } else {
+                        showToast('Failed to add item: ' + data.message);
+                        button.textContent = 'Add to Wishlist';
+                        button.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Add Error:', error);
+                    showToast('Error adding item: ' + error.message);
+                    button.textContent = 'Add to Wishlist';
+                    button.disabled = false;
+                });
+            }
+
+            function fetchNewRecommendation() {
+                fetch(`${recommenderUrl}?user_id=${userId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.unique_id) {
+                            // Remove existing recommendation section
+                            const existingSection = document.querySelector('.recommendation-section');
+                            if (existingSection) {
+                                existingSection.remove();
+                            }
+                            const recommendationSection = document.createElement('div');
+                            recommendationSection.className = 'recommendation-section';
+                            recommendationSection.innerHTML = `
+                                <h2 class="recommendation-title">Recommended for You</h2>
+                                <div class="card" data-unique-id="${data.unique_id}">
+                                    <a href="${data.link_to_disc}" class="card-link">
+                                        <img src="${data.image_url}" alt="${data.title}" onerror="this.src='/static/placeholder.svg';">
+                                        <h2>${data.title}</h2>
+                                        <h3>Price: ${data.price}${data.currency}</h3>
+                                        ${data.speed || data.glide || data.turn || data.fade ?
+                                            `<div class="flight-ratings">
+                                                <strong>Flight Ratings:</strong><br>
+                                                Speed: <span class="speed">${data.speed ?? 'N/A'}</span>, 
+                                                Glide: <span class="glide">${data.glide ?? 'N/A'}</span>, 
+                                                Turn: <span class="turn">${data.turn ?? 'N/A'}</span>, 
+                                                Fade: <span class="fade">${data.fade ?? 'N/A'}</span>
+                                            </div>` : ''}
+                                        <p>Store: ${data.store}</p>
+                                    </a>
+                                    <button class="custombutton wishlist-button" data-product='${JSON.stringify(data)}'>Add to Wishlist</button>
+                                </div>
+                            `;
+                            document.querySelector('.main-container').insertAdjacentElement('afterend', recommendationSection);
+                            const newButton = recommendationSection.querySelector('.wishlist-button');
+                            const newCard = recommendationSection.querySelector('.card');
+                            newButton.addEventListener('click', () => addToWishlist(data, newCard, newButton));
+                            const speedElem = newCard.querySelector('.speed');
+                            const glideElem = newCard.querySelector('.glide');
+                            const turnElem = newCard.querySelector('.turn');
+                            const fadeElem = newCard.querySelector('.fade');
+                            if (speedElem) speedElem.textContent = formatNumber(data.speed);
+                            if (glideElem) glideElem.textContent = formatNumber(data.glide);
+                            if (turnElem) turnElem.textContent = formatNumber(data.turn);
+                            if (fadeElem) fadeElem.textContent = formatNumber(data.fade);
+                        } else {
+                            console.warn('No valid recommendation:', data);
+                            showToast('No new recommendation available');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Recommendation fetch error:', error);
+                        showToast('Failed to load recommendation');
+                    });
             }
         });
     </script>
@@ -209,7 +402,7 @@
                 infoBackdrop.classList.remove('active');
                 setTimeout(() => {
                     document.body.style.overflow = '';
-                }, 300); 
+                }, 300);
             });
     
             infoBackdrop.addEventListener('click', (event) => {
@@ -219,36 +412,5 @@
             });
         });
     </script>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var wishlistButtons = document.querySelectorAll('.wishlist-button');
-            
-            wishlistButtons.forEach(function(button) {
-                button.addEventListener('click', function() {
-                    this.textContent = 'Removed';
-                    this.classList.add('removed');
-    
-                    var card = this.closest('.card');
-                    if (card) {
-                        card.style.transition = 'opacity 0.3s ease';
-                        card.style.opacity = '0';
-                        
-                        setTimeout(() => {
-                            card.remove();
-    
-                            if (document.querySelectorAll('.card').length === 0) {
-                                var paginationWrapper = document.querySelector('.pagination-wrapper');
-                                if (paginationWrapper) {
-                                    paginationWrapper.style.display = 'none';
-                                }
-                            }
-                        }, 300);
-                    }
-                });
-            });
-        });
-    </script>
-
 </body>
 </html>

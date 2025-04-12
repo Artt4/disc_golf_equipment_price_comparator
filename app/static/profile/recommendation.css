@@ -1,0 +1,13 @@
+.recommendation-section {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.recommendation-title {
+    color: white;
+    font-size: 1.8em;
+    margin-bottom: 20px;
+    text-align: center;
+}
