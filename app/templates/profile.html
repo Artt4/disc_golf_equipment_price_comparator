@@ -307,7 +307,7 @@
                         button.textContent = 'Added';
                         button.classList.add('added');
                         const wishlistContainer = document.getElementById('wishlist-container');
-                        wishlistContainer.insertAdjacentHTML('afterbegin', createCard(productData));
+                        wishlistContainer.insertAdjacentHTML('beforeend', createCard(productData));
                         const newCard = wishlistContainer.querySelector(`[data-unique-id="${data.unique_id}"]`);
                         const newButton = newCard.querySelector('.wishlist-button');
                         newButton.addEventListener('click', () => removeFromWishlist(productData, newCard, newButton));
