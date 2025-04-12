@@ -6,15 +6,15 @@ from app.handle_credentials import get_secret
 def create_conn():
     for attempt in range(3):
         try:
-            #connection_socket = get_secret("connection_socket")
-            connection_host = get_secret("connection_host")
+            connection_socket = get_secret("connection_socket")
+            #connection_host = get_secret("connection_host")
             connection_user = get_secret("connection_user")
             connection_password = get_secret("connection_password")
             connection_database = get_secret("connection_database")
 
             return pymysql.connect(
-                #unix_socket=connection_socket,
-                host = connection_host,
+                unix_socket=connection_socket,
+                #host = connection_host,
                 user=connection_user,
                 password=connection_password,
                 database=connection_database,
