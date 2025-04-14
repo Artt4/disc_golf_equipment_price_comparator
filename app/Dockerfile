@@ -13,4 +13,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 
 # Start Flask app using gunicorn
-CMD ["gunicorn", "-b", "0.0.0.0:8080", "app.main:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:8080", "main:app"]
