@@ -3,8 +3,8 @@ import os
 import requests
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 from flask_oauthlib.client import OAuth
-from app.handle_credentials import get_secret
-from app.handle_db_connections import create_conn, execute_insert, execute_select
+from handle_credentials import get_secret
+from handle_db_connections import create_conn, execute_insert, execute_select
 import logging
 
 app = Flask(__name__)
