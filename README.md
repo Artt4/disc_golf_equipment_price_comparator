@@ -93,3 +93,17 @@ From a technical and architectural perspective, the process is as follows:
 ### Use case diagram
 
 ## API documentation
+
+| Endpoint               | Method | Parameters (Query/Body)                                                                 | Response                                                                 | Auth Required |
+|------------------------|--------|----------------------------------------------------------------------------------------|--------------------------------------------------------------------------|---------------|
+| `/login`               | GET    | None                                                                                   | Redirects to Google OAuth                                                | No            |
+| `/logout`              | GET    | None                                                                                   | Redirects to `/products`                                                 | Yes           |
+| `/auth/callback`       | GET    | OAuth callback params                                                                  | **Success:** Redirects to `/products`<br>**Error:** Error message       | No            |
+| `/`                    | GET    | None                                                                                   | Renders `home.html`                                                      | No            |
+| `/products`            | GET    | **Query:**<br>`search`, `price_min/max`, `speed_min/max`, `glide_min/max`, `turn_min/max`, `fade_min/max`, `store[]`, `sort`, `page` | Renders `product_grid.html` with filtered products | No            |
+| `/profile`             | GET    | None                                                                 | Renders `profile.html` with user data and wishlist                       | Yes           |
+| `/add-to-wishlist`     | POST   | **Body (JSON):**<br>`{"currency": str, "fade": int, "glide": int, "image_url": str, "link_to_disc": str, "price": str, "speed": int, "store": str, "title": str, "turn": int, "unique_id": str, "wishlist_count": int}`                                             | `{"success": bool, "message": "Added to wishlist", "unique_id": str}`                    | Yes           |
+| `/remove-from-wishlist`| POST   | **Body (JSON):**<br>`{"currency": str, "fade": int, "glide": int, "image_url": str, "link_to_disc": str, "price": str, "speed": int, "store": str, "title": str, "turn": int, "unique_id": str, "wishlist_count": int}`                                              | `{"success": bool, "message": "Removed from wishlist", "unique_id": str}`                    | Yes           |
+| `/get-wishlist`        | GET    | None                                                                                   | `{"success": bool, "products": [...]}` or `{"success": false, "message": str}` | Yes       |
+| `/recommend`   | GET    | **Query:**<br>`user_id` (required) | **Success:** `{"currency": str, "fade": int, "glide": int, "image_url": str, "link_to_disc": str, "price": str, "speed": int, "store": str, "title": str, "turn": int, "unique_id": str, "wishlist_count": int}`<br>**Error:** `{"title": "No recommendation available", "unique_id": None}` | Yes |
+
