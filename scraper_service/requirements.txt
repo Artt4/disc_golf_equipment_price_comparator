@@ -1,11 +1,5 @@
-requests
-Flask
 beautifulsoup4
+requests
 python-dotenv
-lxml-html-clean
-pymysql
-gunicorn
 google-cloud-secret-manager
-Werkzeug==2.2.2
-Flask-OAuthlib
-requests-html
+pymysql

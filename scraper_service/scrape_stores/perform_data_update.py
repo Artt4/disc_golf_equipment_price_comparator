@@ -12,6 +12,6 @@ def run_all_scrapers():
     get_data_discsport() 
     get_data_par3() 
     get_data_powergrip_from_bulk() 
-    #run_latitude64_scraper()
+    #run_latitude64_scraper()   Currently not working
 
 

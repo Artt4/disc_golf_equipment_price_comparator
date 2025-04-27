@@ -13,7 +13,7 @@ def get_rendered_html(url):
         page = browser.new_page(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
         try:
             print(f"Visiting: {url}")
-            page.goto(url, timeout=10000)  # 10s timeout for navigation
+            page.goto(url, timeout=10000)
             page.wait_for_load_state("networkidle", timeout=5000)  # Wait for all requests
             page.wait_for_selector("article.productitem", timeout=5000)  # wait for content
         except PlaywrightTimeout:
