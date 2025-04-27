@@ -5,3 +5,4 @@ google-cloud-secret-manager
 requests
 pymysql
 gunicorn
+Werkzeug==2.2.2
