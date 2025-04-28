@@ -165,11 +165,12 @@ def profile():
         user = {'email': 'Unknown', 'picture': ''}
 
     # Get recommendation
-    recommender_url = (
-        "http://localhost:8080/recommend"
-        if os.getenv("APP_ENV") == "local"
-        else app.config["RECOMMENDER_URL"]
-    )
+    if os.getenv("APP_ENV") == "local":
+        recommender_url = "http://localhost:8080/recommend"
+    else:
+        base = app.config["RECOMMENDER_URL"].rstrip("/")         
+        recommender_url = base if base.endswith("/recommend") \
+                            else f"{base}/recommend"            
 
     try:
         # give Cloud Run enough time for a cold-start
