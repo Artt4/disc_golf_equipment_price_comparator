@@ -1,4 +1,4 @@
-USE disc_golf_db;
+USE main_schema;
 
 CREATE TABLE product_table (
     unique_id VARCHAR(256),
