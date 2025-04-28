@@ -258,7 +258,7 @@ def get_wishlist():
         if connection:
             connection.close()
 
-# Helper functions
+# Helper functions:
 def process_product(product):
     if product.get('speed') is not None:
         product['speed'] = float(product['speed'])
