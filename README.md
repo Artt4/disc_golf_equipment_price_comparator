@@ -158,8 +158,8 @@ From a technical and architectural perspective, the process is as follows:
 1. Search for **"SQL"** in GCP → Create a **MySQL 8.0** instance.  
    - **Instance ID**: `disc-golf-db` (or custom).  
    - **Password**: *Choose a strong password (do not reuse the example!)*.  
-   - **Region**: `europe-north1` (recommended for cost).  
-   - **Machine Type**: Shared core, 1 vCPU, 0.614 GB RAM.  
+   - **Region**: `europe-north1` (or another preferred region).  
+   - **Machine Type**: Shared core, 1 vCPU, 0.614 GB RAM (recommended for cost).  
    - **Storage**: 10 GB HDD.  
 
 2. **Create Database**:  
