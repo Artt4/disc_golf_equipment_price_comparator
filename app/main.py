@@ -187,7 +187,8 @@ def profile():
         total_pages=(len(products) + per_page - 1) // per_page,
         pages_to_display=range(page, min(page + 3, ((len(products) + per_page - 1) // per_page) + 1)),
         user=user,
-        recommendation=recommendation
+        recommendation=recommendation,
+        recommender_url=recommender_url
     )
 
 @app.route('/add-to-wishlist', methods=['POST'])

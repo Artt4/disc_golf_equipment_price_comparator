@@ -19,6 +19,13 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='profile/recommendation.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='profile/wishlist.css') }}">
 
+    <script>
+        const RECOMMENDER_URL = {{ recommender_url | tojson | safe }};
+        const USER_ID        = {{ session.id      | tojson | safe }};
+    </script>
+      
+      
+
     <style>
         .toast {
             position: fixed;
@@ -197,8 +204,6 @@
         document.addEventListener("DOMContentLoaded", function() {
             const products = {{ products | tojson | safe }};
             const recommendation = {{ recommendation | tojson | safe }};
-            const userId = {{ session.id | tojson | safe }};
-            const recommenderUrl = {{ "https://recommender-534282508863.europe-north1.run.app/recommend" | tojson | safe }};
 
             function formatNumber(number) {
                 if (number === null || number === undefined) {
@@ -234,6 +239,9 @@
                     }
                 }
             });
+            if (!document.querySelector(".recommendation-section")) {
+                fetchNewRecommendation();
+            }
 
             function removeFromWishlist(productData, card, button) {
                 button.disabled = true;
@@ -336,7 +344,7 @@
             }
 
             function fetchNewRecommendation() {
-                fetch(`${recommenderUrl}?user_id=${userId}`)
+                fetch(`${RECOMMENDER_URL}?user_id=${USER_ID}`)
                     .then(response => {
                         if (!response.ok) {
                             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
