@@ -9,7 +9,7 @@ import logging
 
 app = Flask(__name__)
 
-# Set up logging
+# Set up logging.
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
