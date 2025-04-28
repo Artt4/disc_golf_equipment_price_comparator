@@ -107,3 +107,155 @@ From a technical and architectural perspective, the process is as follows:
 | `/get-wishlist`        | GET    | None                                                                                   | `{"success": bool, "products": [...]}` or `{"success": false, "message": str}` | Yes       |
 | `/recommend`   | GET    | **Query:**<br>`user_id` (required) | **Success:** `{"currency": str, "fade": int, "glide": int, "image_url": str, "link_to_disc": str, "price": str, "speed": int, "store": str, "title": str, "turn": int, "unique_id": str, "wishlist_count": int}`<br>**Error:** `{"title": "No recommendation available", "unique_id": None}` | Yes |
 
+**Setup Guide**  
+---
+
+### **Prerequisites**  
+1. **Google Cloud Account**: Ensure you have a Google Cloud account with billing enabled.  
+2. **Repository Access**: Clone or fork the application repository to your local machine.  
+3. **Basic Tools**: Familiarity with Google Cloud Console (GCP) and the `gcloud` CLI.  
+
+---
+
+### **1. Project Setup**  
+#### **1.1 Create a New Project**  
+1. Navigate to [Google Cloud Console](https://console.cloud.google.com).  
+2. Click the project dropdown (top-left) → **New Project**.  
+   - Name: `testing-deployment` (or your preferred name).  
+3. **Enable Billing**:  
+   - Search for "Billing" in the top bar → Link your account.  
+
+#### **1.2 Enable Required APIs**  
+1. Open **Cloud Shell** (top-right toolbar).  
+2. Set your project ID:  
+   ```bash
+   gcloud projects list  # Copy the PROJECT_ID
+   gcloud config set project PROJECT_ID
+   ```  
+3. Enable APIs:  
+   ```bash
+   gcloud services enable \
+	artifactregistry.googleapis.com \
+	cloudbuild.googleapis.com \
+	oslogin.googleapis.com \
+	pubsub.googleapis.com \
+	run.googleapis.com \
+	cloudscheduler.googleapis.com \
+	sqladmin.googleapis.com \
+	compute.googleapis.com \
+	containerregistry.googleapis.com \
+	iamcredentials.googleapis.com \
+	iam.googleapis.com \
+	secretmanager.googleapis.com \
+	appengine.googleapis.com \
+	artifactregistry.googleapis.com
+   ```  
+
+---
+
+### **2. Database Configuration**  
+#### **2.1 Create a Cloud SQL Instance**  
+1. Search for **"SQL"** in GCP → Create a **MySQL 8.0** instance.  
+   - **Instance ID**: `disc-golf-db` (or custom).  
+   - **Password**: *Choose a strong password (do not reuse the example!)*.  
+   - **Region**: `europe-north1` (recommended for cost).  
+   - **Machine Type**: Shared core, 1 vCPU, 0.614 GB RAM.  
+   - **Storage**: 10 GB HDD.  
+
+2. **Create Database**:  
+   - Under the **Databases** tab → Name: `main_schema`.  
+
+3. **Create User**:  
+   - Under the **Users** tab → Add account:  
+     - Username: `app-user`  
+     - Password: *Choose a secure password (not the example!)*.  
+
+#### **2.2 Initialize Database Schema**  
+1. Navigate to **Cloud SQL Studio** → Select `main_schema`.  
+2. Log in with `app-user` credentials.  
+3. In the **Editor** tab, run the provided SQL script from the repository. Ensure `USE main_schema;` is the first line.  
+
+---
+
+### **3. OAuth Client Configuration**  
+1. Search for **"Google Auth Platform"** → **Create Credentials** → **OAuth Client ID**.  
+   - **Application Type**: Web Application.  
+   - **Name**: `testing-deployment` (or custom).  
+   - **Authorized Redirect URIs**: Temporarily leave blank (configure later).  
+2. Download the JSON credentials file. Note the `client_id` and `client_secret`.  
+
+---
+
+### **4. Secret Manager Setup**  
+Create the following secrets in **Secret Manager**:  
+- `google_secret`: Value = `client_secret` from OAuth JSON.  
+- `google_id`: Value = `client_id` from OAuth JSON.  
+- `connection_socket`:  
+  ```bash
+  # Retrieve using:
+  gcloud sql instances list --format="table(connectionName)"
+  # Format: /cloudsql/PROJECT_ID:REGION:INSTANCE_NAME
+  ```  
+- `connection_user`: Database username (e.g., `app-user`).  
+- `connection_password`: Database user password.  
+- `connection_database`: `main_schema`.  
+- `SECRET_KEY`: Generate via Cloud Shell:  
+  ```bash
+  openssl rand -base64 32  # Copy the output.
+  ```  
+
+---
+
+### **5. Build and Deploy Services**  
+#### **5.1 Artifact Repository**  
+```bash
+gcloud artifacts repositories create cloud-run-source-deploy \
+  --repository-format=docker \
+  --location=europe-north1 \
+  --description="Images for Disc-Golf app"
+```  
+
+#### **5.2 Assign Service Account Roles**  
+1. Navigate to **IAM & Admin** → **Service Accounts**.  
+2. Edit the **Default Compute Service Account** → Add roles:  
+-   Artifact Registry Writer
+-   Cloud Functions Invoker
+-   Cloud Run Admin
+-   Cloud Run Invoker
+-   Cloud SQL Client
+-   Secret Manager Secret Accessor
+-   Service Account User
+-   Storage Object Admin 
+
+#### **5.3 Submit Build**  
+```bash
+cd /path/to/cloned-repo
+gcloud builds submit --project=PROJECT_ID
+```  
+
+---
+
+### **6. Deploy Services**  
+#### **6.1 Scraper Job**  
+1. In **Cloud Run** → **Jobs** → **Create Job**:  
+   - **Container Image**: Select `scraper_job` from Artifact Registry.  
+   - **Region**: `europe-north1`.  
+   - **Resources**: 2 vCPU, 2 GB RAM.  
+   - **Secrets**: Mount `connection_database`, `connection_password`, `connection_socket`, `connection_user`.  
+   - **SQL Connection**: Link your Cloud SQL instance.  
+
+#### **6.2 Recommender Service**  
+1. In **Cloud Run** → **Create Service**:  
+   - **Container Image**: Select `recommender-service`.  
+   - **Allow Unauthenticated Invocations**: Yes.  
+   - **Secrets**: Same as scraper.  
+   - **SQL Connection**: Link the instance.  
+
+#### **6.3 Frontend Service**  
+1. In **Cloud Run** → **Create Service**:  
+   - **Container Image**: Select `frontend-service`.  
+   - **Add Secrets**: Include all secrets from "Secret Manager Setup" + new secret`recommender_url` (URL of the recommender service).  
+   - **Authorized Redirect URI**:  
+     - After deployment, note your service URL (e.g., `https://frontend-service-XXXX.run.app`).  
+     - Add `http://frontend-service-XXXX.run.app/auth/callback` (HTTP, not HTTPS) to OAuth Client settings.  
+
