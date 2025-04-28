@@ -84,6 +84,13 @@ From a technical and architectural perspective, the process is as follows:
 ## UML diagrams
 
 ### Component diagram
+<p align="center">
+  <img
+    src="https://github.com/user-attachments/assets/db984ae2-83ab-4539-90a6-1dbf8e7d2ab4"
+    alt="Component diagram"
+    width="100%"
+  />
+</p>
 
 ### Deployment diagram
 ![gcp deploy](https://github.com/user-attachments/assets/2fd50b65-3436-4224-865c-e562b1ebd567)
@@ -97,6 +104,13 @@ Key processes such as authentication are marked as optional (`opt`), the scraper
 
 
 ### Use case diagram
+<p align="center">
+  <img
+    src="https://github.com/user-attachments/assets/eea92929-4ec9-4fd4-ab55-30b35b1a252b"
+    alt="Usecase"
+    width="50%"
+  />
+</p>
 
 ## API documentation
 
