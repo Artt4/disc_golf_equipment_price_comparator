@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 app.secret_key = get_secret("SECRET_KEY")
 app.config['GOOGLE_ID'] = get_secret("google_id")
 app.config['GOOGLE_SECRET'] = get_secret("google_secret")
+app.config['RECOMMENDER_URL'] = get_secret("recommender_url")
 
 oauth = OAuth(app)
 google = oauth.remote_app(
@@ -164,7 +165,7 @@ def profile():
         user = {'email': 'Unknown', 'picture': ''}
 
     # Get recommendation
-    recommender_url = "http://localhost:8080/recommend" if os.getenv("APP_ENV") == "local" else "https://recommender-534282508863.europe-north1.run.app/recommend"
+    recommender_url = "http://localhost:8080/recommend" if os.getenv("APP_ENV") == "local" else app.config['RECOMMENDER_URL']
     try:
         response = requests.get(f"{recommender_url}?user_id={session_id}", timeout=5)
         recommendation = response.json()
