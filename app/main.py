@@ -165,14 +165,21 @@ def profile():
         user = {'email': 'Unknown', 'picture': ''}
 
     # Get recommendation
-    recommender_url = "http://localhost:8080/recommend" if os.getenv("APP_ENV") == "local" else app.config['RECOMMENDER_URL']
+    recommender_url = (
+        "http://localhost:8080/recommend"
+        if os.getenv("APP_ENV") == "local"
+        else app.config["RECOMMENDER_URL"]
+    )
+
     try:
-        response = requests.get(f"{recommender_url}?user_id={session_id}", timeout=5)
+        # give Cloud Run enough time for a cold-start
+        response = requests.get(f"{recommender_url}?user_id={session_id}", timeout=20)
+        response.raise_for_status()          # raise if HTTP 4xx/5xx
         recommendation = response.json()
     except requests.RequestException as e:
         logger.error(f"Recommendation error: {e}")
         recommendation = {"title": "Recommendation unavailable", "unique_id": None}
-    
+        
     return render_template(
         'profile.html', 
         products=paginated_products,
