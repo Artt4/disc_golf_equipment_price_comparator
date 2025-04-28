@@ -1,0 +1,52 @@
+substitutions:
+  _REGION: europe-north1
+  _REPO: cloud-run-source-deploy
+  _TAG: latest
+
+steps:
+  # Front-end
+  - name: gcr.io/cloud-builders/docker
+    dir: app
+    args: 
+      - build
+      - -t
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend-service:${_TAG}
+      - .
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend-service:${_TAG}
+
+  # Recommender
+  - name: gcr.io/cloud-builders/docker
+    dir: recommender_service
+    args:
+      - build
+      - -t
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/recommender_service:${_TAG}
+      - .
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/recommender_service:${_TAG}
+
+  # Scraper
+  - name: gcr.io/cloud-builders/docker
+    dir: batch_jobs/scraper_job
+    args:
+      - build
+      - -t
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/scraper_job:${_TAG}
+      - .
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/scraper_job:${_TAG}
+
+images:
+- ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend-service:${_TAG}
+- ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/recommender_service:${_TAG}
+- ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/scraper_job:${_TAG}
