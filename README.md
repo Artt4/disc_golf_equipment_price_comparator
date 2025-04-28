@@ -89,6 +89,12 @@ From a technical and architectural perspective, the process is as follows:
 ![gcp deploy](https://github.com/user-attachments/assets/2fd50b65-3436-4224-865c-e562b1ebd567)
 
 ### Data flow diagram
+The Data Flow Diagram below explains how data moves through the Disc Golf Equipment Price Comparator system. It shows interactions between the user, internal services (like the front-end, authentication, scraper, and recommender), external data sources, and the Cloud SQL database. User actions trigger data retrieval, authentication, and recommendation processes, while background services ensure that product data is kept up-to-date.
+
+Key processes such as authentication are marked as optional (`opt`), the scraper runs on a scheduled loop (`loop`), and background updates happen in parallel (`par`). These markers help visualize conditional, repetitive, and parallel operations within the system.
+
+![data_flow](https://github.com/user-attachments/assets/a683896d-f04d-41c3-8c2f-5dcf7eeb684c)
+
 
 ### Use case diagram
 
