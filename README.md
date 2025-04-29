@@ -23,11 +23,9 @@ This will enables site visitors to easily search, filter, and compare products b
 
 ## Technical summary
 
-From a technical and architectural perspective, the process is as follows:
-
-* The product information from different sources is collected by executing the perform_data_update.py file, which will execute functions to read data from different stores, normalize it, and store it in a MySQL database hosted on Google Cloud.
-* Then, in main.py, the data is read and rendered into the front-end using templating and Flask, a web application library. The front-end utilizes HTML, CSS, and JavaScript embedded within the HTML.
-* For deploying the web application to the internet, a Google Cloud native service called Google App Engine is used. A new version of the web application based on the latest version in the repository is automatically deployed to the Google App Engine.
+- **Main Application** (`main.py`): This service contains the main back-end and front-end implementation. On the back-end, it is responsible for pulling data from the databases, parsing the data, handling user authentication, and managing user sessions. After the data is prepared, the system uses it to feed into HTML templates, which are populated and displayed in browsers with applied styling. The HTML and CSS implementation is complemented by scripts written in JavaScript, which implement features to enhance user experience. For example, when applying a search function, the product page resets to the first page. Similarly, these scripts also handle other minor functionalities that improve the overall feel.
+- **Recommender Service** (`recommender.py`): Separately from the main application, we have set up the recommender service. This service operates standalone to generate product recommendations for users in their profiles based on patterns of what other users have chosen to add to their wishlists. Essentially, when accessing the main application to check a wishlist, the application performs a GET request from the recommender service to look up the current user's wishlist items and other users' wishlist items, providing the best-fitting recommendations.
+- **Scraper Service** (`run_scraper.py`): To gather all product data, we scrape it from disc golf equipment reseller and manufacturer sites. This service is run manually, without a predefined period, to scrape all mapped websites. The period for scraping is undefined and is performed manually as needed to avoid unnecessarily loading the resellers' and manufacturers' websites. The scraped data is cleaned and parsed into the necessary format before being written to the main database, which is used by both the main application and the recommender service.
 
 ## System architecture
 
