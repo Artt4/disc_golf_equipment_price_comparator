@@ -82,6 +82,7 @@ This will enables site visitors to easily search, filter, and compare products b
 ## UML diagrams
 
 ### Component diagram
+The system includes a web application with a front-end UI and backend API, a recommender service, and a scraper service. The scraper service is composed of multiple store-specific scrapers that gather product data from various sources and store it in a shared MySQL database. The recommender service analyzes user product history and product data to generate personalized recommendations. The web application handles user authentication via Google OAuth and retrieves product and recommendation data from the backend and MySQL.
 <p align="center">
   <img
     src="https://github.com/user-attachments/assets/db984ae2-83ab-4539-90a6-1dbf8e7d2ab4"
@@ -91,6 +92,7 @@ This will enables site visitors to easily search, filter, and compare products b
 </p>
 
 ### Deployment diagram
+Users access the app via a web browser, connecting to front-end, scraper, and recommender microservices running on App Engine. Authentication is handled through Google OAuth with Cloud IAM. All services interact with a MySQL database on Cloud SQL, which stores product and user data in separate schemas. The architecture ensures modularity, scalability, and secure user management.
 ![gcp deploy](https://github.com/user-attachments/assets/2fd50b65-3436-4224-865c-e562b1ebd567)
 
 ### Data flow diagram
@@ -102,6 +104,7 @@ Key processes such as authentication are marked as optional (`opt`), the scraper
 
 
 ### Use case diagram
+The Use Case diagram models the interactions between a user and a disc golf price comparison system. The user can view products (with options to filter/sort and search), log in using Google, manage a wishlist (add/remove items), and view their profile. Several actions such as wishlist management and profile viewing require prior login.
 <p align="center">
   <img
     src="https://github.com/user-attachments/assets/eea92929-4ec9-4fd4-ab55-30b35b1a252b"
